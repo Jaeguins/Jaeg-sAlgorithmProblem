@@ -1,27 +1,83 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
+#include<iostream>
+#include <string>
+#include<vector>
 using namespace std;
-vector<pair<int, int>> lists;
 
-bool compare(pair<int, int>& front, pair<int, int>& back) {
-    if (front.first == back.first)
-        return front.second <= back.second;
-    return front.first < back.first;
+int char2int(char input) {
+    if (input >= '0' && input <= '9')
+        return input - '0';
+    if (input >= 'A' && input <= 'F')
+        return input - 'A' + 10;
+    if (input >= 'a' && input <= 'f')
+        return input - 'a' + 10;
+    throw std::invalid_argument("Invalid input string");
+}
+
+char int2char[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+int bufferCount = 0;
+
+void printChar(char t) {
+    if (bufferCount == 80) {
+        cout << endl;
+        bufferCount = 0;
+    }
+    cout << t;
+    bufferCount++;
 }
 
 int main() {
-    int N;
-    cin >> N;
-    for (int i = 0; i < N; i++) {
-        int x, y;
-        cin >> x;
-        cin >> y;
+    int P;
+    cin >> P;
+    for (int i = 0; i < P; i++) {
+        int B;
+        cin >> B;
+        string ret;
 
-        pair<int, int> tmp = pair<int, int>(x, y);
-        lists.push_back(tmp);
+        int counter = 0;
+        int status = 2;
+        int preCount = 0;
+        while (counter < B*2) {
+            char first,second;
+            cin>>first;
+            cin>>second;
+            int nowFirst = char2int(first),
+                nowSecond = char2int(second);
+            if (status > 1&&preCount==0) {
+                if (nowFirst >= 8)
+                    status = 0;
+                else
+                    status = 1;
+            }
+            else {
+                if (status == 0) { status = 2; }
+                else { status = 3; }
+            }
+            switch (status) {
+            case 0:
+                preCount = (nowFirst - 8) * 16 + nowSecond + 3;
+                break;
+            case 1:
+                preCount = nowFirst * 16 + nowSecond + 1;
+                break;
+            case 2:
+                for(int i=0;i<preCount;preCount--) {
+                    ret+=int2char[nowFirst];
+                    ret+=int2char[nowSecond];
+                }
+                break;
+            case 3:
+                ret+=int2char[nowFirst];
+                ret+=int2char[nowSecond];
+                preCount--;
+                break;
+            }
+            counter += 2;
+        }
+        cout<<ret.size()/2<<endl;
+        bufferCount=0;
+        for (char element : ret) {
+            printChar(element);
+        }
+        cout<<endl;
     }
-    sort(lists.begin(), lists.end(), compare);
-    for (auto& ptr : lists)
-        cout << ptr.first << ' ' << ptr.second << '\n';
 }
